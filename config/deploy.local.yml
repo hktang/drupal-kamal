@@ -1,0 +1,57 @@
+servers:
+  web:
+    - 127.0.0.1
+
+proxy:
+  ssl: false
+  # Update /etc/hosts to map this host for local testing.
+  host: nara.localhost
+
+# ----------------------------------------------------------------------------
+# Credentials for local registry (and ssh user)
+# ----------------------------------------------------------------------------
+registry:
+  server: registry.local:5000
+  username:
+    - LOCAL_REGISTRY_USERNAME
+  password:
+    - LOCAL_REGISTRY_PASSWORD
+# Use local builder
+builder:
+  # The build driver to use, defaults to docker-container:
+  driver: docker
+  local: true
+
+# SSH user to connect as (defaults to root)
+ssh:
+  user: deng
+
+# Inject ENV variables into containers (secrets come from .kamal/secrets).
+env:
+  clear:
+    APP_ENV: development
+    MYSQL_HOST: nara-db
+    MYSQL_USER: root
+    MYSQL_PORT: 3306
+  secret:
+    # Password for the user defined in MYSQL_USER
+    - MYSQL_PASSWORD
+
+volumes:
+  - "local_kamal_drupal_files:/var/www/html/web/sites/default/files"
+
+accessories:
+  redis:
+    host: 127.0.0.1
+  db:
+    image: mysql:8.0
+    host: 127.0.0.1
+    port: "127.0.0.1:3306:3306"
+    env:
+      clear:
+        MYSQL_ROOT_HOST: "%"
+      secret:
+        # Required by the mysql image to set root password
+        - MYSQL_ROOT_PASSWORD
+    directories:
+      - mysql_data:/var/lib/mysql

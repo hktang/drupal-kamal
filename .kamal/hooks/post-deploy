@@ -1,0 +1,28 @@
+#!/bin/bash -x
+
+# A sample post-deploy hook
+#
+# These environment variables are available:
+# KAMAL_RECORDED_AT
+# KAMAL_PERFORMER
+# KAMAL_VERSION
+# KAMAL_HOSTS
+# KAMAL_ROLES (if set)
+# KAMAL_DESTINATION (if set)
+# KAMAL_RUNTIME
+
+# Set destination flag if KAMAL_DESTINATION is set
+DEST_FLAG=()
+
+if [ -n "$KAMAL_DESTINATION" ]; then
+  DEST_FLAG=(-d "$KAMAL_DESTINATION")
+fi
+
+# Meilisearch init and config.
+# Running inside the production app container.
+# kamal app exec -v --reuse "${DEST_FLAG[@]}" /var/www/html/config/meilisearch/configure
+
+# Drush deploy
+kamal app exec -v --reuse "${DEST_FLAG[@]}" /var/www/html/vendor/bin/drush deploy
+
+echo "$KAMAL_PERFORMER deployed $KAMAL_VERSION to $KAMAL_DESTINATION in $KAMAL_RUNTIME seconds"

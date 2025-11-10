@@ -1,0 +1,19 @@
+.ddev/
+.github/
+cypress/
+docs/
+node_modules/
+vendor/
+
+.DS_Store
+*.sql
+*.tmp
+*.log
+*.bak
+*.zip
+*.tar.gz
+
+
+# Config files for DDEV and local.
+web/sites/default/settings.ddev*
+web/sites/default/settings.local.php

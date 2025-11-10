@@ -1,0 +1,101 @@
+# Name of your application. Used to uniquely configure containers.
+service: nara
+
+# Name of the container image.
+image: hktang/nara
+
+# Deploy to these servers.
+servers:
+  web:
+    - 123.123.123.123
+  # job:
+  #   hosts:
+  #     - 192.168.0.1
+  #   cmd: bin/jobs
+
+# Enable SSL auto certification via Let's Encrypt and allow for multiple apps on a single web server.
+# Remove this section when using multiple web servers and ensure you terminate SSL at your load balancer.
+#
+# Note: If using Cloudflare, set encryption mode in SSL/TLS setting to "Full" to enable CF-to-app encryption.
+proxy:
+  ssl: true
+  host: nara.example.com
+  # Proxy connects to your container on port 80 by default.
+  app_port: 8080
+  # Kamal's default healthcheck path is /up. The path exposed by serversideup/php is /healthcheck.
+  healthcheck:
+    path: /healthcheck
+
+# ----------------------------------------------------------------------------
+# Credentials for remote registry
+# ----------------------------------------------------------------------------
+registry:
+  # Specify the registry server, if you're not using Docker Hub
+  # server: registry.digitalocean.com / ghcr.io / ...
+  server: ghcr.io
+  username: hktang
+  # Always use an access token rather than real password (pulled from .kamal/secrets).
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+builder:
+  arch: amd64
+  context: .
+
+# Inject ENV variables into containers (secrets come from .kamal/secrets).
+env:
+  clear:
+    # Environment identifier
+    APP_ENV: production
+    APP_DOMAIN: example.com
+
+    # MySQL settings
+    MYSQL_DATABASE: demo
+    MYSQL_USER: demo
+    MYSQL_PORT: 25060
+
+    # serversideup/php settings.
+    PHP_OPCACHE_ENABLE: 1
+  secret:
+    - DRUPAL_HASH_SALT
+    - MYSQL_HOST
+    - MYSQL_PASSWORD
+
+# Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
+# "bin/kamal app logs -r job" will tail logs from the first server in the job section.
+#
+aliases:
+  shell: app exec --interactive --reuse "sh"
+  shell-local: app exec --interactive --reuse "sh" -d local
+
+  dcr: app exec --reuse -v /var/www/html/vendor/bin/drush cr
+  dcr-l: app exec --reuse -d local -v /var/www/html/vendor/bin/drush cr
+
+# Use a persistent storage volume.
+volumes:
+  - "prod_kamal_drupal_files:/var/www/html/web/sites/default/files"
+# Bridge fingerprinted assets, like JS and CSS, between versions to avoid
+# hitting 404 on in-flight requests. Combines all files from new and old
+# version inside the asset_path.
+#
+# asset_path: /app/public/assets
+
+# Configure rolling deploys by setting a wait time between batches of restarts.
+#
+# boot:
+#   limit: 10 # Can also specify as a percentage of total hosts, such as "25%"
+#   wait: 2
+
+# Use accessory services (secrets come from .kamal/secrets).
+#
+accessories:
+  # Acceessible within the Kamal networ as "nara-redis"
+  redis:
+    service: nara-redis
+    image: valkey/valkey:8
+    host: 137.184.251.157
+    # port: 6379:6379 # This will expose the port to the world.
+    # To make redis accessible from the host machine only:
+    port: 127.0.0.1:6379:6379
+
+    directories:
+      - nara_redis_data:/data
