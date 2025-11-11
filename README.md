@@ -144,7 +144,8 @@ Post‑deploy runs `drush deploy` to update the DB, import config, and clear cac
 Rollback:
 
 ```bash
-kamal rollback
+kamal app container -p
+kamal rollback <image_version_id>
 ```
 
 Shell into running container:
