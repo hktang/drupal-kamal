@@ -17,3 +17,7 @@ vendor/
 # Config files for DDEV and local.
 web/sites/default/settings.ddev*
 web/sites/default/settings.local.php
+
+
+# Ignore kamal config files.
+config/deploy*.yml
