@@ -18,7 +18,7 @@ Deployment & Ops:
 - Persistent volume for `web/sites/default/files`.
 - Serversideup/php exposes `/healthcheck`.
 - Registry configuration + secrets via `.kamal/secrets`.
-- Shell & Drush aliases (e.g., `kamal dcr`).
+- Shell & Drush aliases (e.g., `kamal drush`).
 
 Configuration Management:
 

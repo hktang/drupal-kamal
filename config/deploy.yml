@@ -67,8 +67,8 @@ aliases:
   shell: app exec --interactive --reuse "sh"
   shell-local: app exec --interactive --reuse "sh" -d local
 
-  dcr: app exec --reuse -v /var/www/html/vendor/bin/drush cr
-  dcr-l: app exec --reuse -d local -v /var/www/html/vendor/bin/drush cr
+  drush: app exec --reuse -v /var/www/html/vendor/bin/drush
+  drush-l: app exec --reuse -d local -v /var/www/html/vendor/bin/drush
 
 # Use a persistent storage volume.
 volumes:
